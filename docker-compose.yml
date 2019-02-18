@@ -1,0 +1,52 @@
+version: '3.2'
+services:
+  galaxy-postgres:
+    # If you are using the official postgres image, it needs to be populated by calling
+    # docker-compose run galaxy install_db.sh
+    # on first run
+    image: bgruening/galaxy-stable:${TAG_GALAXY_WEB:-latest}
+    container_name: galaxy-postgres
+    hostname: galaxy-postgres
+    env_file: .env
+    volumes:
+      - type: bind
+        source: ${DIR_GALAXY_POSTGRES:-/you/need/a/valid/path/if/you/do/not/specify/DIR_GALAXY_POSTGRES/in/the/compose/environment/file}
+        target: /etc/supervisor
+      - type: volume
+        source: galaxy-store
+        target: /export
+    ports:
+      - "9002:9002"
+    expose:
+      - "5432"
+    entrypoint: /etc/supervisor/config/startup.sh
+
+  # This container provides the galaxy uwsgi webhandlers, job handlers, nginx
+  galaxy-stable:
+    image: bgruening/galaxy-stable:${TAG_GALAXY_WEB:-latest}
+    container_name: galaxy-stable
+    depends_on:
+      - galaxy-postgres
+    env_file: .env
+    environment:
+      # In case the galaxy-init container is not used, you need to include "sleeplock" to NONUSE
+      - NONUSE=postgres,sleeplock
+      - GALAXY_CONFIG_DATABASE_CONNECTION=postgresql://galaxy:galaxy@galaxy-postgres:5432/galaxy
+    hostname: galaxy-stable
+    privileged: True
+    ports:
+      - "${GALAXY_PORT:-8080}:80" # nginx
+    volumes:
+        # This is the directory where all your files from Galaxy will be stored on your host system
+      - type: volume
+        source: galaxy-store
+        target: /export
+volumes:
+  # init galaxy-store data container using the following commands
+  #   docker volume create galaxy-store
+  #   docker volume inspect galaxy-store
+  #   docker create --mount source=galaxy-store,target=/export --name galaxy-store bgruening/galaxy-stable /bin/true
+  #   docker run --rm -ti -p 8080:80 --volumes-from galaxy-store --name galaxy_bootstrap bgruening/galaxy-stable
+  #   # Then use ^C to quit after export volume is initialized
+  galaxy-store:
+    external: true
