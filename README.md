@@ -15,9 +15,18 @@ As of this writing, the changes needed are:
 
 ## Part 1 - create and initialize a data-storage container
 
+You can run
+```bash
+./prep.sh
+```
+which automates the following:
+
 ### Create storage volume galaxy-store
 ```bash
 docker volume create galaxy-store
+```
+### Validate storage volume (optional)
+```bash
 docker volume inspect galaxy-store
 ```
 ### Create storage container named galaxy-store
