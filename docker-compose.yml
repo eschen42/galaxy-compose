@@ -15,8 +15,6 @@ services:
       - type: volume
         source: galaxy-store
         target: /export
-    ports:
-      - "9002:9002"
     expose:
       - "5432"
     entrypoint: /etc/supervisor/config/startup.sh
