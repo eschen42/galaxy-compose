@@ -13,7 +13,7 @@ services:
         source: ${DIR_GALAXY_POSTGRES:-/you/need/a/valid/path/if/you/do/not/specify/DIR_GALAXY_POSTGRES/in/the/compose/environment/file}
         target: /etc/supervisor
       - type: volume
-        source: galaxy-store
+        source: galaxy-store-vol
         target: /export
     expose:
       - "5432"
@@ -37,14 +37,18 @@ services:
     volumes:
         # This is the directory where all your files from Galaxy will be stored on your host system
       - type: volume
-        source: galaxy-store
+        source: galaxy-store-vol
         target: /export
 volumes:
-  # init galaxy-store data container using the following commands
-  #   docker volume create galaxy-store
-  #   docker volume inspect galaxy-store
-  #   docker create --mount source=galaxy-store,target=/export --name galaxy-store bgruening/galaxy-stable /bin/true
-  #   docker run --rm -ti -p 8080:80 --volumes-from galaxy-store --name galaxy_bootstrap bgruening/galaxy-stable
+  # init galaxy-store-data container using the following commands
+  #   # create the volume
+  #   docker volume create galaxy-store-vol
+  #   # optional, inspect resulting volume
+  #   docker volume inspect galaxy-store-vol
+  #   # create the data-storage container
+  #   docker create --mount source=galaxy-store-vol,target=/export --name galaxy-store-data bgruening/galaxy-stable /bin/true
+  #   # initialize the data-storage container
+  #   docker run --rm -ti -p 8080:80 --volumes-from galaxy-store-data --name galaxy_bootstrap bgruening/galaxy-stable
   #   # Then use ^C to quit after export volume is initialized
-  galaxy-store:
+  galaxy-store-vol:
     external: true
