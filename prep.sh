@@ -15,3 +15,5 @@ docker create --mount source=galaxy-store-vol,target=/export --name galaxy-store
 echo Press control-C once this starts the web server.
 docker run --rm -ti -p 8080:80 --volumes-from galaxy-store-data --name galaxy_bootstrap bgruening/galaxy-stable
 
+### Create storage volume pgadmin4-vol
+docker volume create pgadmin4-vol

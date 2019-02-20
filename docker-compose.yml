@@ -39,6 +39,25 @@ services:
       - type: volume
         source: galaxy-store-vol
         target: /export
+
+  # PostgreSQL admin suite
+  pgadmin4:
+    image: thajeztah/pgadmin4
+    container_name: pgadmin4
+    env_file: .env
+    ports:
+        - "5050:5050"
+    volumes:
+        # This is the volume to persist pgadmin4 data
+      - type: volume
+        source: pgadmin4-vol
+        target: /pgadmin
+    restart: unless-stopped
+    depends_on:
+      - galaxy-postgres
+    labels:
+        kompose.service.type: nodeport
+
 volumes:
   # init galaxy-store-data container using the following commands
   #   # create the volume
@@ -51,4 +70,9 @@ volumes:
   #   docker run --rm -ti -p 8080:80 --volumes-from galaxy-store-data --name galaxy_bootstrap bgruening/galaxy-stable
   #   # Then use ^C to quit after export volume is initialized
   galaxy-store-vol:
+    external: true
+  # init pgadmin4-data container using the following commands
+  #   # create the volume
+  #   docker volume create pgadmin4-vol
+  pgadmin4-vol:
     external: true
