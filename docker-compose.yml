@@ -1,16 +1,12 @@
 version: '3.2'
 services:
   galaxy-postgres:
-    # If you are using the official postgres image, it needs to be populated by calling
-    # docker-compose run galaxy install_db.sh
-    # on first run
-    image: bgruening/galaxy-stable:${TAG_GALAXY_WEB:-latest}
+    image: ${IMAGE_GALAXY_POSTGRES}
     container_name: galaxy-postgres
     hostname: galaxy-postgres
-    env_file: .env
     volumes:
       - type: bind
-        source: ${DIR_GALAXY_POSTGRES:-/you/need/a/valid/path/if/you/do/not/specify/DIR_GALAXY_POSTGRES/in/the/compose/environment/file}
+        source: ${DIR_GALAXY_POSTGRES}
         target: /etc/supervisor
       - type: volume
         source: galaxy-store-vol
@@ -21,19 +17,15 @@ services:
 
   # This container provides the galaxy uwsgi webhandlers, job handlers, nginx
   galaxy-stable:
-    image: bgruening/galaxy-stable:${TAG_GALAXY_WEB:-latest}
+    image: ${IMAGE_GALAXY_STABLE}
     container_name: galaxy-stable
     depends_on:
       - galaxy-postgres
-    env_file: .env
-    environment:
-      # In case the galaxy-init container is not used, you need to include "sleeplock" to NONUSE
-      - NONUSE=postgres,sleeplock
-      - GALAXY_CONFIG_DATABASE_CONNECTION=postgresql://galaxy:galaxy@galaxy-postgres:5432/galaxy
+    env_file: ./env/galaxy-stable
     hostname: galaxy-stable
     privileged: True
     ports:
-      - "${GALAXY_PORT:-8080}:80" # nginx
+      - "${GALAXY_PORT}:80" # nginx
     volumes:
         # This is the directory where all your files from Galaxy will be stored on your host system
       - type: volume
@@ -42,9 +34,8 @@ services:
 
   # PostgreSQL admin suite
   pgadmin4:
-    image: thajeztah/pgadmin4
+    image: ${IMAGE_PGADMIN4}
     container_name: pgadmin4
-    env_file: .env
     ports:
         - "5050:5050"
     volumes:
