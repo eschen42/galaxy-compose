@@ -17,3 +17,9 @@ docker run --rm -ti -p 8080:80 --volumes-from galaxy-store-data --name galaxy_bo
 
 ### Create storage volume pgadmin4-vol
 docker volume create pgadmin4-vol
+
+### Create storage volume docker-data-vol
+docker volume create docker-data-vol
+
+### Create storage volume docker-docker-vol
+docker volume create docker-docker-vol
