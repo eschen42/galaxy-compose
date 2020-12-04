@@ -17,6 +17,9 @@ SCRIPT=$(basename ${SOURCE})
 # execute from the directory containing this script
 pushd $DIR
 
+# get environment variables
+. default.env
+
 # compose Galaxy from services defined in the YAML file
 docker-compose -f docker-compose.yml up --remove-orphans -d
 RESULT=$?

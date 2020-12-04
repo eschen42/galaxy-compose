@@ -17,6 +17,9 @@ SCRIPT=$(basename ${SOURCE})
 # execute from the directory containing this script
 pushd $DIR
 
+# get environment variables
+. default.env
+
 # shutdown postgresql gracefully
 docker-compose exec galaxy-postgres supervisorctl stop postgresql
 # shutdown the supervisor and remaining processes gracefully

@@ -1,2 +1,4 @@
+GALAXY_CONFIG_BRAND=xmi-compose
+GALAXY_CONFIG_ADMIN_USERS=eschen@alumni.princeton.edu
 GALAXY_CONFIG_DATABASE_CONNECTION=postgresql://galaxy:galaxy@galaxy-postgres:5432/galaxy
 NONUSE=proftpd,postgres,sleeplock

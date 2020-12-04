@@ -30,6 +30,9 @@ trap "{ echo ${SCRIPT}: TERM $DIR; _term TERM $DIR; }" TERM
 # execute from the directory containing this script
 pushd $DIR
 
+# get environment variables
+. default.env
+
 # compose Galaxy from services defined in the YAML file
 docker-compose -f docker-compose.yml up --remove-orphans &
 export CHILD=$! 

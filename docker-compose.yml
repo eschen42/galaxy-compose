@@ -11,7 +11,10 @@ services:
     hostname: galaxy-stable
     privileged: True
     ports:
-      - "${GALAXY_PORT}:80" # nginx
+      - target: 80
+        published: ${GALAXY_PORT}
+        protocol: tcp
+        mode: host
     volumes:
         # This is the directory where all your files from Galaxy will be stored on your host system
       - type: volume
@@ -92,25 +95,15 @@ services:
         target: /var/lib/docker
         read_only: true
     ports:
-      - "8021:21" # ftp - only works in PASV mode at the moment, e.g., 'ftp -p localhost 8021'
-      - "8022:22" # sftp
-      # - "30000-30010:30000-30010" # ftp ports for non PASV mode - this is not working yet
+      - "${GALAXY_FTP_PORT}:21" # ftp - only works in PASV mode at the moment, e.g., 'ftp -p localhost 8021'
+      - "${GALAXY_SSH_PORT}:22" # sftp
     restart: always
     depends_on:
       - galaxy-postgres
     entrypoint: /etc/supervisor/config/startup.sh
 
 volumes:
-  # init galaxy-store-data container using the following commands
-  #   # create the volume
-  #   docker volume create galaxy-store-vol
-  #   # optional, inspect resulting volume
-  #   docker volume inspect galaxy-store-vol
-  #   # create the data-storage container
-  #   docker create --mount source=galaxy-store-vol,target=/export --name galaxy-store-data bgruening/galaxy-stable /bin/true
-  #   # initialize the data-storage container
-  #   docker run --rm -ti -p 8080:80 --volumes-from galaxy-store-data --name galaxy_bootstrap bgruening/galaxy-stable
-  #   # Then use ^C to quit after export volume is initialized
+  # init galaxy-store-data container using prep.sh
   galaxy-store-vol:
     external: true
   # init pgadmin4-data container using the following commands
